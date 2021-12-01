@@ -1,6 +1,7 @@
 <?php
 
 /** @var \Laravel\Lumen\Routing\Router $router */
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,10 +14,10 @@
 |
 */
 
-$router->get('/', function () {
+Route::get('/', function () {
     return view('home');
 });
 
-$router->get('/admin', function() {
+Route::get('/admin', function() {
     return view('admin');
 });

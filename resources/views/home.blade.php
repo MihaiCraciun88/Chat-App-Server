@@ -7,7 +7,7 @@
 <title>Chat App Server</title>
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <style>
-body {background: #fff;}
+body {background: #333;color:#fff;}
 .message {background:#6c757d;margin:0 0 5px 0;padding:10px;border-radius:10px;clear:both;float:left;color:#fff;}
 .self-message {background:#0d6efd;float:right;}
 #history {overflow:hidden;max-height:300px;}
@@ -47,12 +47,10 @@ window.onload = function() {
                 message.value = '';
             };
 
-            console.log(conn.sessionid());
-
             conn.subscribe(wsChatId, function(topic, data) {
                 let div = document.createElement('div');
                 div.className = 'message' + (data.wsChatId === wsChatId ? ' self-message' : '');
-                div.innerHTML = data.message;
+                div.innerHTML = data.message.replace(/\n/, '<br>');
                 history.append(div);
             });
         },
