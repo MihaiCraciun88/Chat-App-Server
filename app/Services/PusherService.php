@@ -1,12 +1,15 @@
 <?php
-namespace App\Models;
+namespace App\Services;
 
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Message;
+use App\Models\Conversation;
 use Illuminate\Support\Facades\DB;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 
-class Pusher implements WampServerInterface {
+class PusherService implements WampServerInterface {
     /**
      * A lookup of all the topics clients have subscribed to
      */

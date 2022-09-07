@@ -5,9 +5,13 @@ use Exception;
 use Illuminate\Console\Command;
 
 // Your shell script
-use Ratchet\WebSocket\WsServer;
-use Ratchet\Http\HttpServer;
+use React\EventLoop\Loop;
+use App\Services\PusherService;
+use React\Socket\SocketServer;
 use Ratchet\Server\IoServer;
+use Ratchet\Http\HttpServer;
+use Ratchet\WebSocket\WsServer;
+use Ratchet\Wamp\WampServer;
 
 class WebsocketCommand extends Command {
     /**
@@ -31,15 +35,15 @@ class WebsocketCommand extends Command {
      */
     public function handle()
     {
-        $loop   = \React\EventLoop\Loop::get();
-        $pusher = new \App\Models\Pusher;
+        $loop   = Loop::get();
+        $pusher = new PusherService;
 
         // Set up our WebSocket server for clients wanting real-time updates
-        $webSock = new \React\Socket\SocketServer(env('WEBSOCKER_ADDRESS', '127.0.0.1:8080'), [], $loop); // Binding to 0.0.0.0 means remotes can connect
-        $webServer = new \Ratchet\Server\IoServer(
-            new \Ratchet\Http\HttpServer(
-                new \Ratchet\WebSocket\WsServer(
-                    new \Ratchet\Wamp\WampServer(
+        $webSock = new SocketServer(env('WEBSOCKER_ADDRESS', '127.0.0.1:8080'), [], $loop);
+        $webServer = new IoServer(
+            new HttpServer(
+                new WsServer(
+                    new WampServer(
                         $pusher
                     )
                 )
