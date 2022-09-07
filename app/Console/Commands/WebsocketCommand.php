@@ -35,7 +35,7 @@ class WebsocketCommand extends Command {
         $pusher = new \App\Models\Pusher;
 
         // Set up our WebSocket server for clients wanting real-time updates
-        $webSock = new \React\Socket\SocketServer(env('PUSHER_ADDRESS', '127.0.0.1:8080'), [], $loop); // Binding to 0.0.0.0 means remotes can connect
+        $webSock = new \React\Socket\SocketServer(env('WEBSOCKER_ADDRESS', '127.0.0.1:8080'), [], $loop); // Binding to 0.0.0.0 means remotes can connect
         $webServer = new \Ratchet\Server\IoServer(
             new \Ratchet\Http\HttpServer(
                 new \Ratchet\WebSocket\WsServer(

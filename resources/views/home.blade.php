@@ -5,7 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
 <title>Chat App Server</title>
-<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="{{ url('/') }}/css/bootstrap.min.css" rel="stylesheet">
+<link href="{{ url('/') }}/css/chatbox.css" rel="stylesheet">
+<script src="{{ url('/') }}/js/chatbox.js"></script>
+<script src="{{ url('/') }}/js/autobahn.js"></script>
+<script>
+class ChatboxWsDriver {
+    init(chat) {
+        var conn;
+        chat.on('init', () => {
+            conn = new ab.Session('ws://localhost:8080',
+                () => {
+                    conn.subscribe(chat.getUuid(), function(topic, data) {
+                        console.log(topic, data);
+                        if (chat.getUuid() === data.uuid) {
+                            chat.addChat(data.text, data.date);
+                        } else {
+                            chat.addReply(data);
+                        }
+                    });
+                },
+                () => console.warn('WebSocket connection closed'),
+                {'skipSubprotocolCheck': true}
+            );
+        });
+        chat.on('send', (input) => {
+            console.log(input);
+            conn.publish(chat.config.uuid, JSON.stringify({
+                'uuid': chat.config.uuid,
+                'message': input,
+            }));
+        });
+    }
+}
+const chat = new Chatbox(), driver = new ChatboxWsDriver();
+chat.setDriver(driver);
+</script>
 <style>
 body {background: #333;color:#fff;}
 .message {background:#6c757d;margin:0 0 5px 0;padding:10px;border-radius:10px;clear:both;float:left;color:#fff;}
@@ -15,52 +50,7 @@ body {background: #333;color:#fff;}
 </head>
 <body>
 <div class="container py-4">
-    <div id="history"></div>
-    <form>
-        <div class="mb-3">
-            <label for="mesage" class="form-label">Mesaj</label>
-            <textarea id="message" class="form-control"></textarea>
-        </div>
-        <div class="mb-3">
-            <button id="send" type="button" class="btn btn-danger">Send</button>
-        </div>
-    </form>
+    
 </div>
-
-<script src="js/autobahn.js"></script>
-<script>
-window.onload = function() {
-    var conn = new ab.Session('ws://localhost:8080',
-        function() {
-            var wsChatId = localStorage.getItem('wsChatId') || conn.sessionid();
-            var message = document.getElementById('message');
-            var history = document.getElementById('history');
-
-            localStorage.setItem('wsChatId', wsChatId);
-
-            document.getElementById('send').onclick = function() {
-                var data = {
-                    'wsChatId': wsChatId,
-                    'message': message.value
-                };
-                conn.publish(wsChatId, JSON.stringify(data));
-                message.value = '';
-            };
-
-            conn.subscribe(wsChatId, function(topic, data) {
-                let div = document.createElement('div');
-                div.className = 'message' + (data.wsChatId === wsChatId ? ' self-message' : '');
-                div.innerHTML = data.message.replace(/\n/, '<br>');
-                history.append(div);
-            });
-        },
-        function() {
-            console.warn('WebSocket connection closed');
-        },
-        {'skipSubprotocolCheck': true}
-    );
-}
-</script>
-
 </body>
 </html>

@@ -23,6 +23,7 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
+            'uuid' => $this->faker->uuid,
             'name' => $this->faker->name,
             'email' => $this->faker->unique()->safeEmail,
             'phone' => $this->faker->unique()->phoneNumber,
@@ -30,5 +31,15 @@ class UserFactory extends Factory
             'created_at' => now(),
             'updated_at' => now(),
         ];
+    }
+
+    
+    public function role(int $role)
+    {
+        return $this->state(function (array $attributes) use ($role) {
+            return [
+                'role' => $role,
+            ];
+        });
     }
 }
