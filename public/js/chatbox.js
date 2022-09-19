@@ -57,6 +57,9 @@ class Chatbox {
                 this.chatIconElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 32C114.6 32 0 125.1 0 240c0 49.6 21.4 95 57 130.7C44.5 421.1 2.7 466 2.2 466.5c-2.2 2.3-2.8 5.7-1.5 8.7S4.8 480 8 480c66.3 0 116-31.8 140.6-51.4 32.7 12.3 69 19.4 107.4 19.4 141.4 0 256-93.1 256-208S397.4 32 256 32zM128 272c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm128 0c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm128 0c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32z"/></svg>';
                 this.chatIconElement.addEventListener("click", () => this.toggleBox(true));
                 document.body.append(this.chatIconElement);
+                if (!this.config.boxClosed) {
+                    this.inputField.focus();
+                }
             });
             Chatbox.#booted = true;
         }
@@ -160,21 +163,24 @@ class Chatbox {
         this.chatIconElement.classList.toggle('d-none', opened);
         this.config.boxClosed = !opened;
         this.saveConfig();
+        if (!this.config.boxClosed) {
+            this.inputField.focus();
+        }
     }
     saveConfig() {
         localStorage.setItem(this.localStorageName, JSON.stringify(this.config));
     }
     static generateUUID() {
         var d = new Date().getTime();
-        var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;
+        var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = Math.random() * 16;
-            if (d > 0){
-                r = (d + r)%16 | 0;
-                d = Math.floor(d/16);
+            if (d > 0) {
+                r = (d + r) % 16 | 0;
+                d = Math.floor(d / 16);
             } else {
-                r = (d2 + r)%16 | 0;
-                d2 = Math.floor(d2/16);
+                r = (d2 + r) % 16 | 0;
+                d2 = Math.floor(d2 / 16);
             }
             return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
